@@ -116,6 +116,32 @@ func (b *Bridge) Sync(quiet bool) {
 		}
 	}
 
+	swarm_services, err := b.docker.ListServices(dockerapi.ListServicesOptions{})
+
+	if err != nil && quiet {
+		log.Println("error listing swarm services, skipping sync")
+		return
+	} else if err != nil && !quiet {
+		log.Fatal(err)
+	}
+
+	log.Printf("Syncing services on %d swarm services", len(swarm_services))
+
+	// NOTE: This assumes reregistering will do the right thing, i.e. nothing..
+	for _, listing := range swarm_services {
+		services := b.services[listing.ID]
+		if services == nil {
+			b.add(listing.ID, quiet)
+		} else {
+			for _, service := range services {
+				err := b.registry.Register(service)
+				if err != nil {
+					log.Println("sync register failed:", service, err)
+				}
+			}
+		}
+	}
+
 	// Clean up services that were registered previously, but aren't
 	// acknowledged within registrator
 	if b.config.Cleanup {
