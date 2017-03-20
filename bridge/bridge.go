@@ -131,7 +131,7 @@ func (b *Bridge) Sync(quiet bool) {
 	for _, listing := range swarm_services {
 		services := b.services[listing.ID]
 		if services == nil {
-			b.add(listing.ID, quiet)
+			b.addService(listing.ID, quiet)
 		} else {
 			for _, service := range services {
 				err := b.registry.Register(service)
@@ -271,6 +271,69 @@ func (b *Bridge) add(containerId string, quiet bool) {
 		log.Println("added:", container.ID[:12], service.ID)
 	}
 }
+
+func (b *Bridge) addService(serviceId string, quiet bool) {
+	if d := b.deadContainers[serviceId]; d != nil {
+		b.services[serviceId] = d.Services
+		delete(b.deadContainers, serviceId)
+	}
+
+	if b.services[serviceId] != nil {
+		log.Println("service, ", serviceId[:12], ", already exists, ignoring")
+		// Alternatively, remove and readd or resubmit.
+		return
+	}
+
+	service, err := b.docker.InspectService(serviceId)
+	if err != nil {
+		log.Println("unable to inspect service:", serviceId[:12], err)
+		return
+	}
+
+	ports := make(map[string]ServicePort)
+
+	// Extract configured host port mappings, relevant when using overlay
+	for port, _ := range service.Endpoint.Ports {
+		log.Println("parsing port", port)
+		published := []dockerapi.PortBinding{ {"0.0.0.0", port.PublishedPort()}, }
+		ports[string(port)] = servicePort(service, port, published)
+	}
+
+	if len(ports) == 0 && !quiet {
+		log.Println("ignored:", service.ID[:12], "no published ports")
+		return
+	}
+
+	servicePorts := make(map[string]ServicePort)
+	for key, port := range ports {
+		if b.config.Internal != true && port.HostPort == "" {
+			if !quiet {
+				log.Println("ignored:", service.ID[:12], "port", port.ExposedPort, "not published on host")
+			}
+			continue
+		}
+		servicePorts[key] = port
+	}
+
+	isGroup := len(servicePorts) > 1
+	for _, port := range servicePorts {
+		service := b.newService(port, isGroup)
+		if service == nil {
+			if !quiet {
+				log.Println("ignored:", service.ID[:12], "service on port", port.ExposedPort)
+			}
+			continue
+		}
+		err := b.registry.Register(service)
+		if err != nil {
+			log.Println("register failed:", service, err)
+			continue
+		}
+		b.services[service.ID] = append(b.services[service.ID], service)
+		log.Println("added:", service.ID[:12], service.ID)
+	}
+}
+
 
 func (b *Bridge) newService(port ServicePort, isgroup bool) *Service {
 	container := port.container
