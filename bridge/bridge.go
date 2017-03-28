@@ -299,7 +299,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 	for port, _ := range service.Endpoint.Ports {
 		log.Println("parsing port", port)
 		//published := []dockerapi.PortBinding{ {"0.0.0.0", port.PublishedPort()}, }
-		ports[string(port)] = servicePortFromService(service, port)
+		//ports[string(port)] = servicePortFromService(service, port)
 	}
 
 	if len(ports) == 0 && !quiet {
