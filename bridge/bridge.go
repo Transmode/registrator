@@ -2,14 +2,11 @@ package bridge
 
 import (
 	"errors"
-	"fmt"
-	"io"
 	"log"
 	"net"
 	"net/url"
 	"os"
 	"path"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -292,11 +289,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 		log.Println("unable to inspect service:", serviceId[:12], err)
 		return
 	} else {
-		log.Println("service: ", service)
-		writerType := reflect.TypeOf((*io.Writer)(nil)).Elem()
-
-		fileType := reflect.TypeOf((*os.File)(nil))
-		fmt.Println(fileType.Implements(writerType))
+		log.Println("service with ID ", serviceId, ", ", service)
 	}
 
 	ports := make(map[string]ServicePort)
