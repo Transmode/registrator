@@ -296,8 +296,8 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 	log.Println("Endpoint ports for service, ", service.Endpoint.Ports)
 
 	// Extract configured host port mappings, relevant when using overlay
-	for port, _ := range service.Endpoint.Ports {
-		log.Println("parsing port", port)
+	for key, port := range service.Endpoint.Ports {
+		log.Println("parsing port", key, port)
 		//published := []dockerapi.PortBinding{ {"0.0.0.0", port.PublishedPort()}, }
 		//ports[string(port)] = servicePortFromService(service, port)
 	}
