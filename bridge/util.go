@@ -131,7 +131,7 @@ func servicePort(container *dockerapi.Container, port dockerapi.Port, published 
 	}
 }
 
-func servicePortFromService(name string, port dockerapi.Port, env map[string]string) ServicePort {
+func servicePortFromService(name string, port swarm.PortConfig, env []string) ServicePort {
 	log.Println("Creating service port for service", name)
 	log.Println("Port:", port)
 	log.Println("Env:", env)
@@ -148,26 +148,26 @@ func servicePortFromService(name string, port dockerapi.Port, env map[string]str
 	//for overlay networks
 	//detect if container use overlay network, than set HostIP into NetworkSettings.Network[string].IPAddress
 	//better to use registrator with -internal flag
-	nm = service.HostConfig.NetworkMode
-	if nm != "bridge" && nm != "default" && nm != "host" {
-		hip = service.NetworkSettings.Networks[nm].IPAddress
-	}
-
-	exposedPort := strings.Split(string(port), "/")
-	ep = exposedPort[0]
-	if len(exposedPort) == 2 {
-		ept = exposedPort[1]
-	} else {
-		ept = "tcp" // default
-	}
-
-	// Nir: support docker NetworkSettings
-	eip = service.NetworkSettings.IPAddress
-	if eip == "" {
-		for _, network := range service.NetworkSettings.Networks {
-			eip = network.IPAddress
-		}
-	}
+	// nm = service.HostConfig.NetworkMode
+	// if nm != "bridge" && nm != "default" && nm != "host" {
+	// 	hip = service.NetworkSettings.Networks[nm].IPAddress
+	// }
+	//
+	// exposedPort := strings.Split(string(port), "/")
+	// ep = exposedPort[0]
+	// if len(exposedPort) == 2 {
+	// 	ept = exposedPort[1]
+	// } else {
+	// 	ept = "tcp" // default
+	// }
+	//
+	// // Nir: support docker NetworkSettings
+	// eip = service.NetworkSettings.IPAddress
+	// if eip == "" {
+	// 	for _, network := range service.NetworkSettings.Networks {
+	// 		eip = network.IPAddress
+	// 	}
+	// }
 
 	return ServicePort{
 		HostPort:          hp,
@@ -175,8 +175,8 @@ func servicePortFromService(name string, port dockerapi.Port, env map[string]str
 		ExposedPort:       ep,
 		ExposedIP:         eip,
 		PortType:          ept,
-		ContainerID:       service.ID,
-		ContainerHostname: service.Config.Hostname,
-		container:         service,
+		ContainerID:       serviceId,
+		ContainerHostname: "hostname",
+		// container:         service,
 	}
 }
