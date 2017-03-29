@@ -303,7 +303,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 		log.Println("PublishedPort", port.PublishedPort)
 		log.Println("PublishMode", port.PublishMode)
 		//published := []dockerapi.PortBinding{ {"0.0.0.0", port.PublishedPort()}, }
-		ports[string(key)] = servicePortFromService(service.Spec.Name, port, service.Spec.TaskTemplate.ContainerSpec.Env)
+		ports[string(key)] = servicePortFromService(serviceId, service.Spec.Name, port, service.Spec.TaskTemplate.ContainerSpec.Env)
 		log.Println("Service port:", ports[string(key)])
 	}
 
