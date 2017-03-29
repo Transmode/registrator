@@ -131,9 +131,10 @@ func servicePort(container *dockerapi.Container, port dockerapi.Port, published 
 	}
 }
 
-func servicePortFromService(serviceId string, name string, publishedPort string, targetPort string, protocol string, env []string) ServicePort {
+func servicePortFromService(serviceId string, name string, publishedPort uint32, targetPort uint32, env []string) ServicePort {
 	log.Println("Creating service port for service", name)
-	log.Println("Port:", port)
+	log.Println("Published Port:", publishedPort)
+	log.Println("Target Port:", targetPort)
 	log.Println("Env:", env)
 
 	var hp, hip, ep, ept, eip, nm string
@@ -174,7 +175,7 @@ func servicePortFromService(serviceId string, name string, publishedPort string,
 		HostIP:            hip,
 		ExposedPort:       targetPort,
 		ExposedIP:         eip,
-		PortType:          protocol,
+		PortType:          ept,
 		ContainerID:       serviceId,
 		ContainerHostname: "hostname",
 		// container:         service,
