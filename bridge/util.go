@@ -171,9 +171,9 @@ func servicePortFromService(serviceId string, name string, publishedPort uint32,
 	// }
 
 	return ServicePort{
-		HostPort:          publishedPort,
+		HostPort:          strconv.Itoa(publishedPort),
 		HostIP:            hip,
-		ExposedPort:       targetPort,
+		ExposedPort:       strconv.Itoa(targetPort),
 		ExposedIP:         eip,
 		PortType:          ept,
 		ContainerID:       serviceId,
