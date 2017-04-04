@@ -87,7 +87,7 @@ func (r *ConsulAdapter) Register(service *bridge.Service) error {
 	return r.client.Agent().ServiceRegister(registration)
 }
 
-func (r *ConsulAdapter) RegisterSwarmService(serviceID string, serviceName string, servicePort string, serviceTags string, serviceIP string) error {
+func (r *ConsulAdapter) RegisterSwarmService(service *bridge.ServiceSwarm) error {
 	registration := new(consulapi.AgentServiceRegistration)
 	registration.ID = service.ID
 	registration.Name = service.Name
