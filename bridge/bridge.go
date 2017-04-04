@@ -43,6 +43,7 @@ func New(docker *dockerapi.Client, adapterUri string, config Config) (*Bridge, e
 		config:         config,
 		registry:       factory.New(uri),
 		services:       make(map[string][]*Service),
+		servicesSwarm:  make(map[string][]*ServiceSwarm),
 		deadContainers: make(map[string]*DeadContainer),
 	}, nil
 }
@@ -338,7 +339,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 			log.Println("register failed:", service, err)
 			continue
 		}
-		b.services[service.ID] = append(b.services[service.ID], service)
+		b.servicesSwarm[service.ID] = append(b.servicesSwarm[service.ID], service)
 		log.Println("added:", service.ID[:12], service.ID)
 	}
 }
