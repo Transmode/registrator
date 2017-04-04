@@ -65,7 +65,7 @@ func (r *ConsulKVAdapter) Register(service *bridge.Service) error {
 	return err
 }
 
-func (r *ConsulAdapter) RegisterSwarmService(service *bridge.ServiceSwarm) error {
+func (r *ConsulKVAdapter) RegisterSwarmService(service *bridge.ServiceSwarm) error {
 	log.Println("Register swarm service")
 	path := r.path[1:] + "/" + service.Name + "/" + service.ID
 	port := strconv.Itoa(service.Port)

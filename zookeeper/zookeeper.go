@@ -81,7 +81,7 @@ func (r *ZkAdapter) Register(service *bridge.Service) error {
 }
 
 func (r *ZkAdapter) RegisterSwarmService(service *bridge.ServiceSwarm) error {
-	privatePort, _ := strconv.Atoi(service.Origin.ExposedPort)
+	privatePort, _ := strconv.Atoi(service.Origin.Port)
 	publicPortString := strconv.Itoa(service.Port)
 	acl := zk.WorldACL(zk.PermAll)
 	basePath := r.path + "/" + service.Name
@@ -98,7 +98,7 @@ func (r *ZkAdapter) RegisterSwarmService(service *bridge.ServiceSwarm) error {
 				log.Println("zookeeper: failed to create base service node at path '"+basePath+"': ", err)
 			}
 		} // create base path for the service name if it missing
-		zbody := &ZnodeBody{Name: service.Name, IP: service.IP, PublicPort: service.Port, PrivatePort: privatePort, Tags: service.Tags, Attrs: service.Attrs, ContainerID: service.Origin.ContainerHostname}
+		zbody := &ZnodeBody{Name: service.Name, IP: service.IP, PublicPort: service.Port, PrivatePort: privatePort, Tags: service.Tags, Attrs: service.Attrs, ContainerID: "serviceunknown"}
 		body, err := json.Marshal(zbody)
 		if err != nil {
 			log.Println("zookeeper: failed to json encode service body: ", err)
