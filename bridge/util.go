@@ -139,6 +139,9 @@ func servicePortFromService(serviceId string, name string, publishedPort uint32,
 	log.Println("Env:", env)
 
 	var hp, hip, ep, ept, eip, nm string
+	log.Println("hp:", hp)
+	log.Println("ep:", ep)
+	log.Println("nm:", nm)
 	// if len(published) > 0 {
 	// 	hp = published[0].HostPort
 	// 	hip = published[0].HostIP
