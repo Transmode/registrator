@@ -1,6 +1,7 @@
 package bridge
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -171,9 +172,9 @@ func servicePortFromService(serviceId string, name string, publishedPort uint32,
 	// }
 
 	return ServicePort{
-		HostPort:          strconv.Itoa(publishedPort),
+		HostPort:          fmt.Sprint(publishedPort),
 		HostIP:            hip,
-		ExposedPort:       strconv.Itoa(targetPort),
+		ExposedPort:       fmt.Sprint(targetPort),
 		ExposedIP:         eip,
 		PortType:          ept,
 		ContainerID:       serviceId,
