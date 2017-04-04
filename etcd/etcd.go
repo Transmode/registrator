@@ -102,6 +102,26 @@ func (r *EtcdAdapter) Register(service *bridge.Service) error {
 	return err
 }
 
+func (r *EtcdAdapter) RegisterSwarmService(service *bridge.ServiceSwarm) error {
+	r.syncEtcdCluster()
+
+	path := r.path + "/" + service.Name + "/" + service.ID
+	port := strconv.Itoa(service.Port)
+	addr := net.JoinHostPort(service.IP, port)
+
+	var err error
+	if r.client != nil {
+		_, err = r.client.Set(path, addr, uint64(service.TTL))
+	} else {
+		_, err = r.client2.Set(path, addr, uint64(service.TTL))
+	}
+
+	if err != nil {
+		log.Println("etcd: failed to register service:", err)
+	}
+	return err
+}
+
 func (r *EtcdAdapter) Deregister(service *bridge.Service) error {
 	r.syncEtcdCluster()
 

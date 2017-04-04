@@ -53,6 +53,16 @@ func (r *Skydns2Adapter) Register(service *bridge.Service) error {
 	return err
 }
 
+func (r *Skydns2Adapter) RegisterSwarmService(service *bridge.ServiceSwarm) error {
+	port := strconv.Itoa(service.Port)
+	record := `{"host":"` + service.IP + `","port":` + port + `}`
+	_, err := r.client.Set(r.servicePath(service), record, uint64(service.TTL))
+	if err != nil {
+		log.Println("skydns2: failed to register service:", err)
+	}
+	return err
+}
+
 func (r *Skydns2Adapter) Deregister(service *bridge.Service) error {
 	_, err := r.client.Delete(r.servicePath(service), false)
 	if err != nil {
