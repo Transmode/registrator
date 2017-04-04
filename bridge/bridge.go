@@ -22,6 +22,7 @@ type Bridge struct {
 	registry       RegistryAdapter
 	docker         *dockerapi.Client
 	services       map[string][]*Service
+	servicesSwarm  map[string][]*ServiceSwarm
 	deadContainers map[string]*DeadContainer
 	config         Config
 }
