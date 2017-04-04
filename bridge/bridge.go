@@ -312,7 +312,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 		return
 	}
 
-	servicePorts := make(map[string]ServicePort)
+	servicePorts := make(map[string]ServicePortSwarm)
 	for key, port := range ports {
 		if b.config.Internal != true && port.HostPort == "" {
 			if !quiet {
@@ -332,7 +332,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 			}
 			continue
 		}
-		err := b.registry.Register(service)
+		err := b.registry.RegisterSwarmService(service)
 		if err != nil {
 			log.Println("register failed:", service, err)
 			continue

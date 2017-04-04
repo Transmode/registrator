@@ -132,7 +132,7 @@ func servicePort(container *dockerapi.Container, port dockerapi.Port, published 
 	}
 }
 
-func servicePortFromService(serviceId string, name string, publishedPort uint32, targetPort uint32, env []string) ServicePort {
+func servicePortFromService(serviceId string, name string, publishedPort uint32, targetPort uint32, env []string) ServicePortSwarm {
 	log.Println("Creating service port for service", name)
 	log.Println("Published Port:", publishedPort)
 	log.Println("Target Port:", targetPort)
@@ -174,14 +174,12 @@ func servicePortFromService(serviceId string, name string, publishedPort uint32,
 	// 	}
 	// }
 
-	return ServicePort{
-		HostPort:          fmt.Sprint(publishedPort),
-		HostIP:            hip,
-		ExposedPort:       fmt.Sprint(targetPort),
-		ExposedIP:         eip,
-		PortType:          ept,
-		ContainerID:       serviceId,
-		ContainerHostname: "hostname",
-		// container:         service,
+	return ServicePortSwarm{
+		Port:        fmt.Sprint(publishedPort),
+		PortType:    "tcp",
+		ID:          serviceId,
+		Name:        name,
+		serviceTags: "tagsForService",
+		IP:          hip,
 	}
 }

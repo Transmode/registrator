@@ -58,3 +58,12 @@ type ServicePort struct {
 	ContainerName     string
 	container         *dockerapi.Container
 }
+
+type ServicePortSwarm struct {
+	Port        string
+	PortType    string
+	ID          string
+	Name        string
+	serviceTags string
+	IP          string
+}
