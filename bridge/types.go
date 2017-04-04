@@ -42,6 +42,18 @@ type Service struct {
 	Origin ServicePort
 }
 
+type ServiceSwarm struct {
+	ID    string
+	Name  string
+	Port  int
+	IP    string
+	Tags  []string
+	Attrs map[string]string
+	TTL   int
+
+	Origin ServicePortSwarm
+}
+
 type DeadContainer struct {
 	TTL      int
 	Services []*Service

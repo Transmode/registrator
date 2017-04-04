@@ -314,10 +314,10 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 
 	servicePorts := make(map[string]ServicePortSwarm)
 	for key, port := range ports {
-		if b.config.Internal != true && port.HostPort == "" {
-			if !quiet {
-				log.Println("ignored:", service.ID[:12], "port", port.ExposedPort, "not published on host")
-			}
+		if b.config.Internal != true && port.Port == "" {
+			// if !quiet {
+			// 	log.Println("ignored:", service.ID[:12], "port", port.ExposedPort, "not published on host")
+			// }
 			continue
 		}
 		servicePorts[key] = port
@@ -325,7 +325,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 
 	isGroup := len(servicePorts) > 1
 	for _, port := range servicePorts {
-		service := b.newService(port, isGroup)
+		service := b.newServiceSwarm(port, isGroup)
 		if service == nil {
 			if !quiet {
 				log.Println("ignored:", service.ID[:12], "service on port", port.ExposedPort)
@@ -438,6 +438,109 @@ func (b *Bridge) newService(port ServicePort, isgroup bool) *Service {
 	delete(metadata, "tags")
 	delete(metadata, "name")
 	service.Attrs = metadata
+	service.TTL = b.config.RefreshTtl
+
+	return service
+}
+
+func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *Service {
+	//container := port.container
+	//defaultName := strings.Split(path.Base(container.Config.Image), ":")[0]
+
+	// not sure about this logic. kind of want to remove it.
+	hostname := Hostname
+	if hostname == "" {
+		hostname = port.IP
+	}
+	if port.IP == "0.0.0.0" {
+		ip, err := net.ResolveIPAddr("ip", hostname)
+		if err == nil {
+			port.IP = ip.String()
+		}
+	}
+
+	if b.config.HostIp != "" {
+		port.IP = b.config.HostIp
+	}
+
+	//metadata, metadataFromPort := serviceMetaData(container.Config, port.ExposedPort)
+
+	//ignore := mapDefault(metadata, "ignore", "")
+	//if ignore != "" {
+	//	return nil
+	//}
+
+	service := new(ServiceSwarm)
+	service.Origin = port
+	service.ID = hostname + ":" + container.Name[1:] + ":" + port.ExposedPort
+	//service.Name = mapDefault(metadata, "name", defaultName)
+	service.Name = port.Name
+	//if isgroup && !metadataFromPort["name"] {
+	//	service.Name += "-" + port.ExposedPort
+	//}
+	var p int
+
+	if b.config.Internal == true {
+		//service.IP = port.ExposedIP
+		//p, _ = strconv.Atoi(port.ExposedPort)
+	} else {
+		service.IP = port.HostIP
+		p, _ = strconv.Atoi(port.HostPort)
+	}
+	service.Port = p
+
+	if b.config.UseIpFromLabel != "" {
+		containerIp := container.Config.Labels[b.config.UseIpFromLabel]
+		if containerIp != "" {
+			slashIndex := strings.LastIndex(containerIp, "/")
+			if slashIndex > -1 {
+				service.IP = containerIp[:slashIndex]
+			} else {
+				service.IP = containerIp
+			}
+			log.Println("using container IP " + service.IP + " from label '" +
+				b.config.UseIpFromLabel + "'")
+		} else {
+			log.Println("Label '" + b.config.UseIpFromLabel +
+				"' not found in container configuration")
+		}
+	}
+
+	// NetworkMode can point to another container (kuberenetes pods)
+	networkMode := container.HostConfig.NetworkMode
+	if networkMode != "" {
+		if strings.HasPrefix(networkMode, "container:") {
+			networkContainerId := strings.Split(networkMode, ":")[1]
+			log.Println(service.Name + ": detected container NetworkMode, linked to: " + networkContainerId[:12])
+			networkContainer, err := b.docker.InspectContainer(networkContainerId)
+			if err != nil {
+				log.Println("unable to inspect network container:", networkContainerId[:12], err)
+			} else {
+				service.IP = networkContainer.NetworkSettings.IPAddress
+				log.Println(service.Name + ": using network container IP " + service.IP)
+			}
+		}
+	}
+
+	if port.PortType == "udp" {
+		service.Tags = combineTags(
+			mapDefault(metadata, "tags", ""), b.config.ForceTags, "udp")
+		service.ID = service.ID + ":udp"
+	} else {
+		service.Tags = combineTags(
+			mapDefault(metadata, "tags", ""), b.config.ForceTags)
+	}
+
+	//id := mapDefault(metadata, "id", "")
+	id := port.ID
+	if id != "" {
+		service.ID = id
+	}
+
+	//delete(metadata, "id")
+	//delete(metadata, "tags")
+	//delete(metadata, "name")
+	//service.Attrs = metadata
 	service.TTL = b.config.RefreshTtl
 
 	return service
