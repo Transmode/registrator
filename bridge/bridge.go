@@ -328,7 +328,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 		service := b.newServiceSwarm(port, isGroup)
 		if service == nil {
 			if !quiet {
-				log.Println("ignored:", service.ID[:12], "service on port", port.ExposedPort)
+				log.Println("ignored:", service.ID[:12], "service on port", port.Port)
 			}
 			continue
 		}
@@ -472,7 +472,7 @@ func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *Service {
 
 	service := new(ServiceSwarm)
 	service.Origin = port
-	service.ID = hostname + ":" + container.Name[1:] + ":" + port.ExposedPort
+	service.ID = hostname + ":" + service.Name[1:] + ":" + port.Port
 	//service.Name = mapDefault(metadata, "name", defaultName)
 	service.Name = port.Name
 	//if isgroup && !metadataFromPort["name"] {
