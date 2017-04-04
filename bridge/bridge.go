@@ -524,13 +524,15 @@ func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSw
 	// 	}
 	// }
 
+	tempMetadata := make(map[string][]string)
+
 	if port.PortType == "udp" {
 		service.Tags = combineTags(
-			mapDefault(metadata, "tags", ""), b.config.ForceTags, "udp")
+			mapDefault(tempMetadata, "tags", ""), b.config.ForceTags, "udp")
 		service.ID = service.ID + ":udp"
 	} else {
 		service.Tags = combineTags(
-			mapDefault(metadata, "tags", ""), b.config.ForceTags)
+			mapDefault(tempMetadata, "tags", ""), b.config.ForceTags)
 	}
 
 	//id := mapDefault(metadata, "id", "")
