@@ -524,7 +524,7 @@ func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSw
 	// 	}
 	// }
 
-	tempMetadata := make(map[string][]string)
+	tempMetadata := make(map[string]string)
 
 	if port.PortType == "udp" {
 		service.Tags = combineTags(
