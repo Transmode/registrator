@@ -292,7 +292,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 		log.Println("service with ID ", serviceId, ", ", service)
 	}
 
-	ports := make(map[string]ServicePort)
+	ports := make(map[string]ServicePortSwarm)
 	log.Println("Endpoint ports for service, ", service.Endpoint.Ports)
 
 	// Extract configured host port mappings, relevant when using overlay
