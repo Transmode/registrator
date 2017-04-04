@@ -14,6 +14,7 @@ type AdapterFactory interface {
 type RegistryAdapter interface {
 	Ping() error
 	Register(service *Service) error
+	RegisterSwarmService(serviceID string, serviceName string, servicePort string, serviceTags string, serviceIP string) error
 	Deregister(service *Service) error
 	Refresh(service *Service) error
 	Services() ([]*Service, error)

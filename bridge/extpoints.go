@@ -94,18 +94,6 @@ func Register(component interface{}, name string) []string {
 	return ifaces
 }
 
-func RegisterSwarmService(component interface{}, name string) []string {
-	registry.Lock()
-	defer registry.Unlock()
-	var ifaces []string
-	for _, iface := range implements(component) {
-		if ok := registry.extpoints[iface].register(component, name); ok {
-			ifaces = append(ifaces, iface)
-		}
-	}
-	return ifaces
-}
-
 func Unregister(name string) []string {
 	registry.Lock()
 	defer registry.Unlock()
