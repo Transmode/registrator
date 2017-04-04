@@ -443,7 +443,7 @@ func (b *Bridge) newService(port ServicePort, isgroup bool) *Service {
 	return service
 }
 
-func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *Service {
+func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSwarm {
 	//container := port.container
 	//defaultName := strings.Split(path.Base(container.Config.Image), ":")[0]
 
