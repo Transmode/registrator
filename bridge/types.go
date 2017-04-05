@@ -79,4 +79,6 @@ type ServicePortSwarm struct {
 	Name        string
 	serviceTags string
 	IP          string
+	Env         []string
+	Labels      []string
 }

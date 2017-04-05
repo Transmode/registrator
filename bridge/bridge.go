@@ -305,7 +305,7 @@ func (b *Bridge) addService(serviceId string, quiet bool) {
 		log.Println("PublishedPort", port.PublishedPort)
 		log.Println("PublishMode", port.PublishMode)
 		//published := []dockerapi.PortBinding{ {"0.0.0.0", port.PublishedPort()}, }
-		ports[string(key)] = servicePortFromService(serviceId, service.Spec.Name, port.PublishedPort, port.TargetPort, service.Spec.TaskTemplate.ContainerSpec.Env)
+		ports[string(key)] = servicePortFromService(serviceId, service.Spec.Name, port.PublishedPort, port.TargetPort, service.Spec.TaskTemplate.ContainerSpec.Env, service.Spec.TaskTemplate.ContainerSpec.Labels)
 		log.Println("Service port:", ports[string(key)])
 	}
 
@@ -465,7 +465,7 @@ func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSw
 		port.IP = b.config.HostIp
 	}
 
-	//metadata, metadataFromPort := serviceMetaData(container.Config, port.ExposedPort)
+	metadata, metadataFromPort := serviceMetaDataSwarm(port)
 
 	//ignore := mapDefault(metadata, "ignore", "")
 	//if ignore != "" {

@@ -86,6 +86,36 @@ func serviceMetaData(config *dockerapi.Config, port string) (map[string]string, 
 	return metadata, metadataFromPort
 }
 
+func serviceMetaDataSwarm(port ServicePortSwarm) (map[string]string, map[string]bool) {
+	meta := port.Env
+	for k, v := range port.Labels {
+		meta = append(meta, k+"="+v)
+	}
+	metadata := make(map[string]string)
+	metadataFromPort := make(map[string]bool)
+	for _, kv := range meta {
+		kvp := strings.SplitN(kv, "=", 2)
+		if strings.HasPrefix(kvp[0], "SERVICE_") && len(kvp) > 1 {
+			key := strings.ToLower(strings.TrimPrefix(kvp[0], "SERVICE_"))
+			if metadataFromPort[key] {
+				continue
+			}
+			portkey := strings.SplitN(key, "_", 2)
+			_, err := strconv.Atoi(portkey[0])
+			if err == nil && len(portkey) > 1 {
+				if portkey[0] != port {
+					continue
+				}
+				metadata[portkey[1]] = kvp[1]
+				metadataFromPort[portkey[1]] = true
+			} else {
+				metadata[key] = kvp[1]
+			}
+		}
+	}
+	return metadata, metadataFromPort
+}
+
 func servicePort(container *dockerapi.Container, port dockerapi.Port, published []dockerapi.PortBinding) ServicePort {
 	var hp, hip, ep, ept, eip, nm string
 	if len(published) > 0 {
@@ -132,11 +162,12 @@ func servicePort(container *dockerapi.Container, port dockerapi.Port, published 
 	}
 }
 
-func servicePortFromService(serviceId string, name string, publishedPort uint32, targetPort uint32, env []string) ServicePortSwarm {
+func servicePortFromService(serviceId string, name string, publishedPort uint32, targetPort uint32, env []string, labels []string) ServicePortSwarm {
 	log.Println("Creating service port for service", name)
 	log.Println("Published Port:", publishedPort)
 	log.Println("Target Port:", targetPort)
 	log.Println("Env:", env)
+	log.Println("Labels:", labels)
 
 	var hp, hip, ep, ept, eip, nm string
 	log.Println("hp:", hp)
@@ -183,5 +214,7 @@ func servicePortFromService(serviceId string, name string, publishedPort uint32,
 		Name:        name,
 		serviceTags: "tagsForService",
 		IP:          hip,
+		Env:         env,
+		Labels:      labels,
 	}
 }
