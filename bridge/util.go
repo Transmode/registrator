@@ -88,31 +88,33 @@ func serviceMetaData(config *dockerapi.Config, port string) (map[string]string, 
 
 func serviceMetaDataSwarm(port ServicePortSwarm) (map[string]string, map[string]bool) {
 	meta := port.Env
-	for k, v := range port.Labels {
-		meta = append(meta, k+"="+v)
-	}
+	log.Println("meta from Env:", meta)
+	log.Println("Labels:", port.Labels)
+	// for k, v := range port.Labels {
+	// 	meta = append(meta, k+"="+v)
+	// }
 	metadata := make(map[string]string)
 	metadataFromPort := make(map[string]bool)
-	for _, kv := range meta {
-		kvp := strings.SplitN(kv, "=", 2)
-		if strings.HasPrefix(kvp[0], "SERVICE_") && len(kvp) > 1 {
-			key := strings.ToLower(strings.TrimPrefix(kvp[0], "SERVICE_"))
-			if metadataFromPort[key] {
-				continue
-			}
-			portkey := strings.SplitN(key, "_", 2)
-			_, err := strconv.Atoi(portkey[0])
-			if err == nil && len(portkey) > 1 {
-				if portkey[0] != port {
-					continue
-				}
-				metadata[portkey[1]] = kvp[1]
-				metadataFromPort[portkey[1]] = true
-			} else {
-				metadata[key] = kvp[1]
-			}
-		}
-	}
+	// for _, kv := range meta {
+	// 	kvp := strings.SplitN(kv, "=", 2)
+	// 	if strings.HasPrefix(kvp[0], "SERVICE_") && len(kvp) > 1 {
+	// 		key := strings.ToLower(strings.TrimPrefix(kvp[0], "SERVICE_"))
+	// 		if metadataFromPort[key] {
+	// 			continue
+	// 		}
+	// 		portkey := strings.SplitN(key, "_", 2)
+	// 		_, err := strconv.Atoi(portkey[0])
+	// 		if err == nil && len(portkey) > 1 {
+	// 			if portkey[0] != port {
+	// 				continue
+	// 			}
+	// 			metadata[portkey[1]] = kvp[1]
+	// 			metadataFromPort[portkey[1]] = true
+	// 		} else {
+	// 			metadata[key] = kvp[1]
+	// 		}
+	// 	}
+	// }
 	return metadata, metadataFromPort
 }
 
