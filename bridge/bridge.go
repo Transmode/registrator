@@ -466,6 +466,8 @@ func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSw
 	}
 
 	metadata, metadataFromPort := serviceMetaDataSwarm(port)
+	log.Println("metadata:", metadata)
+	log.Println("metadatafromport", metadataFromPort)
 
 	//ignore := mapDefault(metadata, "ignore", "")
 	//if ignore != "" {
