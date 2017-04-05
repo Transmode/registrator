@@ -164,7 +164,7 @@ func servicePort(container *dockerapi.Container, port dockerapi.Port, published 
 	}
 }
 
-func servicePortFromService(serviceId string, name string, publishedPort uint32, targetPort uint32, env []string, labels []string) ServicePortSwarm {
+func servicePortFromService(serviceId string, name string, publishedPort uint32, targetPort uint32, env []string, labels map[string]string) ServicePortSwarm {
 	log.Println("Creating service port for service", name)
 	log.Println("Published Port:", publishedPort)
 	log.Println("Target Port:", targetPort)
