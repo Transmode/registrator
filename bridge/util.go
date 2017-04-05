@@ -49,6 +49,7 @@ func recParseEscapedComma(str string) []string {
 }
 
 func combineTags(tagParts ...string) []string {
+	log.Println("Combining tags from", tagParts)
 	tags := make([]string, 0)
 	for _, element := range tagParts {
 		tags = append(tags, recParseEscapedComma(element)...)
