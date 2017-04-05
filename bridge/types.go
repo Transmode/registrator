@@ -80,5 +80,5 @@ type ServicePortSwarm struct {
 	serviceTags string
 	IP          string
 	Env         []string
-	Labels      []string
+	Labels      map[string]string
 }
