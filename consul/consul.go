@@ -94,10 +94,50 @@ func (r *ConsulAdapter) RegisterSwarmService(service *bridge.ServiceSwarm) error
 	registration.Port = service.Port
 	registration.Tags = service.Tags
 	registration.Address = service.IP
+	registration.Check = r.buildCheck(service)
 	return r.client.Agent().ServiceRegister(registration)
 }
 
 func (r *ConsulAdapter) buildCheck(service *bridge.Service) *consulapi.AgentServiceCheck {
+	check := new(consulapi.AgentServiceCheck)
+	if status := service.Attrs["check_initial_status"]; status != "" {
+		check.Status = status
+	}
+	if path := service.Attrs["check_http"]; path != "" {
+		check.HTTP = fmt.Sprintf("http://%s:%d%s", service.IP, service.Port, path)
+		if timeout := service.Attrs["check_timeout"]; timeout != "" {
+			check.Timeout = timeout
+		}
+	} else if path := service.Attrs["check_https"]; path != "" {
+		check.HTTP = fmt.Sprintf("https://%s:%d%s", service.IP, service.Port, path)
+		if timeout := service.Attrs["check_timeout"]; timeout != "" {
+			check.Timeout = timeout
+		}
+	} else if cmd := service.Attrs["check_cmd"]; cmd != "" {
+		check.Script = fmt.Sprintf("check-cmd %s %s %s", service.Origin.ContainerID[:12], service.Origin.ExposedPort, cmd)
+	} else if script := service.Attrs["check_script"]; script != "" {
+		check.Script = r.interpolateService(script, service)
+	} else if ttl := service.Attrs["check_ttl"]; ttl != "" {
+		check.TTL = ttl
+	} else if tcp := service.Attrs["check_tcp"]; tcp != "" {
+		check.TCP = fmt.Sprintf("%s:%d", service.IP, service.Port)
+		if timeout := service.Attrs["check_timeout"]; timeout != "" {
+			check.Timeout = timeout
+		}
+	} else {
+		return nil
+	}
+	if check.Script != "" || check.HTTP != "" || check.TCP != "" {
+		if interval := service.Attrs["check_interval"]; interval != "" {
+			check.Interval = interval
+		} else {
+			check.Interval = DefaultInterval
+		}
+	}
+	return check
+}
+
+func (r *ConsulAdapter) buildCheck(service *bridge.ServiceSwarm) *consulapi.AgentServiceCheck {
 	check := new(consulapi.AgentServiceCheck)
 	if status := service.Attrs["check_initial_status"]; status != "" {
 		check.Status = status
