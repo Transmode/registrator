@@ -152,9 +152,10 @@ func (r *ConsulAdapter) buildCheckSwarm(service *bridge.ServiceSwarm) *consulapi
 		if timeout := service.Attrs["check_timeout"]; timeout != "" {
 			check.Timeout = timeout
 		}
-	} else if cmd := service.Attrs["check_cmd"]; cmd != "" {
-		check.Script = fmt.Sprintf("check-cmd %s %s %s", service.Origin.ContainerID[:12], service.Origin.ExposedPort, cmd)
-	} else if script := service.Attrs["check_script"]; script != "" {
+	// } else if cmd := service.Attrs["check_cmd"]; cmd != "" {
+	// 	check.Script = fmt.Sprintf("check-cmd %s %s %s", service.Origin.ContainerID[:12], service.Origin.ExposedPort, cmd)
+	// }
+	else if script := service.Attrs["check_script"]; script != "" {
 		check.Script = r.interpolateService(script, service)
 	} else if ttl := service.Attrs["check_ttl"]; ttl != "" {
 		check.TTL = ttl
