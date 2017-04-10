@@ -142,14 +142,17 @@ func (r *ConsulAdapter) buildCheckSwarm(service *bridge.ServiceSwarm) *consulapi
 	log.Println("Parsing check from ", service)
 	check := new(consulapi.AgentServiceCheck)
 	if status := service.Attrs["check_initial_status"]; status != "" {
+		log.Println("check_initial_status")
 		check.Status = status
 	}
 	if path := service.Attrs["check_http"]; path != "" {
+		log.Println("check_http")
 		check.HTTP = fmt.Sprintf("http://%s:%d%s", service.IP, service.Port, path)
 		if timeout := service.Attrs["check_timeout"]; timeout != "" {
 			check.Timeout = timeout
 		}
 	} else if path := service.Attrs["check_https"]; path != "" {
+		log.Println("check_https")
 		check.HTTP = fmt.Sprintf("https://%s:%d%s", service.IP, service.Port, path)
 		if timeout := service.Attrs["check_timeout"]; timeout != "" {
 			check.Timeout = timeout
@@ -160,13 +163,16 @@ func (r *ConsulAdapter) buildCheckSwarm(service *bridge.ServiceSwarm) *consulapi
 		// } else if script := service.Attrs["check_script"]; script != "" {
 		// 	check.Script = r.interpolateService(script, service)
 	} else if ttl := service.Attrs["check_ttl"]; ttl != "" {
+		log.Println("check_ttl")
 		check.TTL = ttl
 	} else if tcp := service.Attrs["check_tcp"]; tcp != "" {
+		log.Println("check_tcp")
 		check.TCP = fmt.Sprintf("%s:%d", service.IP, service.Port)
 		if timeout := service.Attrs["check_timeout"]; timeout != "" {
 			check.Timeout = timeout
 		}
 	} else {
+		log.Println("null check")
 		return nil
 	}
 	if check.Script != "" || check.HTTP != "" || check.TCP != "" {
