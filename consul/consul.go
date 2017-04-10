@@ -98,7 +98,7 @@ func (r *ConsulAdapter) RegisterSwarmService(service *bridge.ServiceSwarm) error
 	return r.client.Agent().ServiceRegister(registration)
 }
 
-func (r *ConsulAdapter) buildCheckSwarm(service *bridge.Service) *consulapi.AgentServiceCheck {
+func (r *ConsulAdapter) buildCheck(service *bridge.Service) *consulapi.AgentServiceCheck {
 	check := new(consulapi.AgentServiceCheck)
 	if status := service.Attrs["check_initial_status"]; status != "" {
 		check.Status = status
@@ -137,7 +137,7 @@ func (r *ConsulAdapter) buildCheckSwarm(service *bridge.Service) *consulapi.Agen
 	return check
 }
 
-func (r *ConsulAdapter) buildCheck(service *bridge.ServiceSwarm) *consulapi.AgentServiceCheck {
+func (r *ConsulAdapter) buildCheckSwarm(service *bridge.ServiceSwarm) *consulapi.AgentServiceCheck {
 	check := new(consulapi.AgentServiceCheck)
 	if status := service.Attrs["check_initial_status"]; status != "" {
 		check.Status = status
