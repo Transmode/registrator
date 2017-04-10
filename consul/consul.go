@@ -155,8 +155,8 @@ func (r *ConsulAdapter) buildCheckSwarm(service *bridge.ServiceSwarm) *consulapi
 		// } else if cmd := service.Attrs["check_cmd"]; cmd != "" {
 		// 	check.Script = fmt.Sprintf("check-cmd %s %s %s", service.Origin.ContainerID[:12], service.Origin.ExposedPort, cmd)
 		//
-	} else if script := service.Attrs["check_script"]; script != "" {
-		check.Script = r.interpolateService(script, service)
+		// } else if script := service.Attrs["check_script"]; script != "" {
+		// 	check.Script = r.interpolateService(script, service)
 	} else if ttl := service.Attrs["check_ttl"]; ttl != "" {
 		check.TTL = ttl
 	} else if tcp := service.Attrs["check_tcp"]; tcp != "" {
