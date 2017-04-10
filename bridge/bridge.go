@@ -545,7 +545,7 @@ func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSw
 	//delete(metadata, "id")
 	//delete(metadata, "tags")
 	//delete(metadata, "name")
-	//service.Attrs = metadata
+	service.Attrs = metadata
 	service.TTL = b.config.RefreshTtl
 
 	return service
