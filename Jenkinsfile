@@ -8,7 +8,7 @@ node('docker') {
 
         def image
         stage('Packaging') {
-            image = docker.build "se-artif-prd.infinera.com/webapps/registrator-swarm:v7"
+            image = docker.build "se-artif-prd.infinera.com/webapps/registrator-swarm:v7.1"
         }
         stage('Publishing') {
             image.push()

@@ -106,7 +106,7 @@ func serviceMetaDataSwarm(port ServicePortSwarm) (map[string]string, map[string]
 			portkey := strings.SplitN(key, "_", 2)
 			_, err := strconv.Atoi(portkey[0])
 			if err == nil && len(portkey) > 1 {
-				if portkey[0] != port {
+				if portkey[0] != port.Port {
 					continue
 				}
 				metadata[portkey[1]] = kvp[1]
