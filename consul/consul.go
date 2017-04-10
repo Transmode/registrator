@@ -134,10 +134,12 @@ func (r *ConsulAdapter) buildCheck(service *bridge.Service) *consulapi.AgentServ
 			check.Interval = DefaultInterval
 		}
 	}
+
 	return check
 }
 
 func (r *ConsulAdapter) buildCheckSwarm(service *bridge.ServiceSwarm) *consulapi.AgentServiceCheck {
+	log.Println("Parsing check from ", service)
 	check := new(consulapi.AgentServiceCheck)
 	if status := service.Attrs["check_initial_status"]; status != "" {
 		check.Status = status
@@ -174,6 +176,7 @@ func (r *ConsulAdapter) buildCheckSwarm(service *bridge.ServiceSwarm) *consulapi
 			check.Interval = DefaultInterval
 		}
 	}
+	log.Println("Created check,", check)
 	return check
 }
 
