@@ -477,8 +477,8 @@ func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSw
 
 	service := new(ServiceSwarm)
 	service.Origin = port
-	service.ID = hostname + ":" + service.Name[1:] + ":" + port.Port
 	service.Name = mapDefault(metadata, "name", defaultName)
+	service.ID = hostname + ":" + service.Name[1:] + ":" + port.Port
 
 	//if isgroup && !metadataFromPort["name"] {
 	//	service.Name += "-" + port.ExposedPort
