@@ -198,7 +198,7 @@ func (b *Bridge) Sync(quiet bool) {
 			// This is a service that does not exist
 			if !found {
 				log.Printf("stale: Removing swarm service %s because it does not exist", listingId)
-				go b.RemoveOnExit(listingId)
+				go b.RemoveOnExitSwarm(listingId)
 			}
 		}
 
