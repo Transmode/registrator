@@ -635,7 +635,7 @@ func (b *Bridge) removeSwarm(serviceId string, deregister bool) {
 	// 	// need to stop the refreshing, but can't delete it yet
 	// 	b.deadContainers[serviceId] = &DeadContainer{b.config.RefreshTtl, b.services[serviceId]}
 	// }
-	delete(b.services, containerId)
+	delete(b.services, serviceId)
 }
 
 // bit set on ExitCode if it represents an exit via a signal
