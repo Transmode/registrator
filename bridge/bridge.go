@@ -202,13 +202,6 @@ func (b *Bridge) Sync(quiet bool) {
 			}
 		}
 
-		log.Println("Cleaning up dangling services")
-		extSwarmServices, err := b.registry.Services()
-		if err != nil {
-			log.Println("cleanup failed:", err)
-			return
-		}
-
 	Outer:
 		for _, extService := range extServices {
 			matches := serviceIDPattern.FindStringSubmatch(extService.ID)
@@ -622,10 +615,10 @@ func (b *Bridge) removeSwarm(serviceId string, deregister bool) {
 					log.Println("deregister failed:", service.ID, err)
 					continue
 				}
-				log.Println("removed:", serviceId[:12], service.ID)
+				log.Println("removed:", serviceId, service.ID)
 			}
 		}
-		// deregisterAll(b.services[serviceId])
+		deregisterAll(b.servicesSwarm[serviceId])
 		// if d := b.deadContainers[serviceId]; d != nil {
 		// 	deregisterAll(d.Services)
 		// 	delete(b.deadContainers, serviceId)
@@ -635,7 +628,7 @@ func (b *Bridge) removeSwarm(serviceId string, deregister bool) {
 	// 	// need to stop the refreshing, but can't delete it yet
 	// 	b.deadContainers[serviceId] = &DeadContainer{b.config.RefreshTtl, b.services[serviceId]}
 	// }
-	delete(b.services, serviceId)
+	delete(b.servicesSwarm, serviceId)
 }
 
 // bit set on ExitCode if it represents an exit via a signal
