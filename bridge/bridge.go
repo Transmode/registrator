@@ -187,7 +187,7 @@ func (b *Bridge) Sync(quiet bool) {
 			log.Println("error listing nonExitedServices, skipping sync", err)
 			return
 		}
-		for listingId, _ := range b.services {
+		for listingId, _ := range b.servicesSwarm {
 			found := false
 			for _, service := range nonExitedServices {
 				if listingId == service.ID {
