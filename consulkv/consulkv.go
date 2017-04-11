@@ -87,6 +87,15 @@ func (r *ConsulKVAdapter) Deregister(service *bridge.Service) error {
 	return err
 }
 
+func (r *ConsulKVAdapter) DeregisterSwarm(service *bridge.ServiceSwarm) error {
+	path := r.path[1:] + "/" + service.Name + "/" + service.ID
+	_, err := r.client.KV().Delete(path, nil)
+	if err != nil {
+		log.Println("consulkv: failed to deregister service:", err)
+	}
+	return err
+}
+
 func (r *ConsulKVAdapter) Refresh(service *bridge.Service) error {
 	return nil
 }

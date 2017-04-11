@@ -190,6 +190,10 @@ func (r *ConsulAdapter) Deregister(service *bridge.Service) error {
 	return r.client.Agent().ServiceDeregister(service.ID)
 }
 
+func (r *ConsulAdapter) DeregisterSwarm(service *bridge.ServiceSwarm) error {
+	return r.client.Agent().ServiceDeregister(service.ID)
+}
+
 func (r *ConsulAdapter) Refresh(service *bridge.Service) error {
 	return nil
 }

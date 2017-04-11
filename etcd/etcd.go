@@ -140,6 +140,24 @@ func (r *EtcdAdapter) Deregister(service *bridge.Service) error {
 	return err
 }
 
+func (r *EtcdAdapter) DeregisterSwarm(service *bridge.ServiceSwarm) error {
+	r.syncEtcdCluster()
+
+	path := r.path + "/" + service.Name + "/" + service.ID
+
+	var err error
+	if r.client != nil {
+		_, err = r.client.Delete(path, false)
+	} else {
+		_, err = r.client2.Delete(path, false)
+	}
+
+	if err != nil {
+		log.Println("etcd: failed to deregister service:", err)
+	}
+	return err
+}
+
 func (r *EtcdAdapter) Refresh(service *bridge.Service) error {
 	return r.Register(service)
 }

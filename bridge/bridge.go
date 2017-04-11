@@ -66,6 +66,10 @@ func (b *Bridge) RemoveOnExit(containerId string) {
 	b.remove(containerId, b.shouldRemove(containerId))
 }
 
+func (b *Bridge) RemoveOnExitSwarm(serviceId string) {
+	b.removeSwarm(serviceId, true)
+}
+
 func (b *Bridge) Refresh() {
 	b.Lock()
 	defer b.Unlock()
@@ -172,6 +176,34 @@ func (b *Bridge) Sync(quiet bool) {
 
 		log.Println("Cleaning up dangling services")
 		extServices, err := b.registry.Services()
+		if err != nil {
+			log.Println("cleanup failed:", err)
+			return
+		}
+
+		log.Println("Listing non-exited services")
+		nonExitedServices, err := b.docker.ListServices(dockerapi.ListServicesOptions{})
+		if err != nil {
+			log.Println("error listing nonExitedServices, skipping sync", err)
+			return
+		}
+		for listingId, _ := range b.services {
+			found := false
+			for _, service := range nonExitedServices {
+				if listingId == service.ID {
+					found = true
+					break
+				}
+			}
+			// This is a service that does not exist
+			if !found {
+				log.Printf("stale: Removing swarm service %s because it does not exist", listingId)
+				go b.RemoveOnExit(listingId)
+			}
+		}
+
+		log.Println("Cleaning up dangling services")
+		extSwarmServices, err := b.registry.Services()
 		if err != nil {
 			log.Println("cleanup failed:", err)
 			return
@@ -575,6 +607,34 @@ func (b *Bridge) remove(containerId string, deregister bool) {
 		// need to stop the refreshing, but can't delete it yet
 		b.deadContainers[containerId] = &DeadContainer{b.config.RefreshTtl, b.services[containerId]}
 	}
+	delete(b.services, containerId)
+}
+
+func (b *Bridge) removeSwarm(serviceId string, deregister bool) {
+	b.Lock()
+	defer b.Unlock()
+
+	if deregister {
+		deregisterAll := func(services []*ServiceSwarm) {
+			for _, service := range services {
+				err := b.registry.DeregisterSwarm(service)
+				if err != nil {
+					log.Println("deregister failed:", service.ID, err)
+					continue
+				}
+				log.Println("removed:", serviceId[:12], service.ID)
+			}
+		}
+		// deregisterAll(b.services[serviceId])
+		// if d := b.deadContainers[serviceId]; d != nil {
+		// 	deregisterAll(d.Services)
+		// 	delete(b.deadContainers, serviceId)
+		// }
+	}
+	// else if b.config.RefreshTtl != 0 && b.services[containerId] != nil {
+	// 	// need to stop the refreshing, but can't delete it yet
+	// 	b.deadContainers[serviceId] = &DeadContainer{b.config.RefreshTtl, b.services[serviceId]}
+	// }
 	delete(b.services, containerId)
 }
 

@@ -71,6 +71,14 @@ func (r *Skydns2Adapter) Deregister(service *bridge.Service) error {
 	return err
 }
 
+func (r *Skydns2Adapter) DeregisterSwarm(service *bridge.ServiceSwarm) error {
+	_, err := r.client.Delete(r.servicePathSwarm(service), false)
+	if err != nil {
+		log.Println("skydns2: failed to register service:", err)
+	}
+	return err
+}
+
 func (r *Skydns2Adapter) Refresh(service *bridge.Service) error {
 	return r.Register(service)
 }
