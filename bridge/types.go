@@ -19,7 +19,6 @@ type RegistryAdapter interface {
 	DeregisterSwarm(serviec *ServiceSwarm) error
 	Refresh(service *Service) error
 	Services() ([]*Service, error)
-	ServicesSwarm() ([]*ServiceSwarm, error)
 }
 
 type Config struct {

@@ -146,6 +146,30 @@ func (r *ZkAdapter) Deregister(service *bridge.Service) error {
 	return err
 }
 
+func (r *ZkAdapter) DeregisterSwarm(service *bridge.ServiceSwarm) error {
+	basePath := r.path + "/" + service.Name
+	if r.path == "/" {
+		basePath = r.path + service.Name
+	}
+	publicPortString := strconv.Itoa(service.Port)
+	servicePortPath := basePath + "/" + service.IP + ":" + publicPortString
+	// Delete the service-port znode
+	err := r.client.Delete(servicePortPath, -1) // -1 means latest version number
+	if err != nil {
+		log.Println("zookeeper: failed to deregister service port entry: ", err)
+	}
+	// Check if all service-port znodes are removed.
+	children, _, err := r.client.Children(basePath)
+	if len(children) == 0 {
+		// Delete the service name znode
+		err := r.client.Delete(basePath, -1)
+		if err != nil {
+			log.Println("zookeeper: failed to delete service path: ", err)
+		}
+	}
+	return err
+}
+
 func (r *ZkAdapter) Refresh(service *bridge.Service) error {
 	return r.Register(service)
 }
