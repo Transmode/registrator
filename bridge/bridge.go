@@ -448,6 +448,7 @@ func (b *Bridge) newService(port ServicePort, isgroup bool) *Service {
 func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSwarm {
 	//container := port.container
 	//defaultName := strings.Split(path.Base(container.Config.Image), ":")[0]
+	defaultName := port.Name
 
 	// not sure about this logic. kind of want to remove it.
 	hostname := Hostname
@@ -476,9 +477,8 @@ func (b *Bridge) newServiceSwarm(port ServicePortSwarm, isgroup bool) *ServiceSw
 
 	service := new(ServiceSwarm)
 	service.Origin = port
-	service.Name = port.Name
 	service.ID = hostname + ":" + service.Name[1:] + ":" + port.Port
-	//service.Name = mapDefault(metadata, "name", defaultName)
+	service.Name = mapDefault(metadata, "name", defaultName)
 
 	//if isgroup && !metadataFromPort["name"] {
 	//	service.Name += "-" + port.ExposedPort
